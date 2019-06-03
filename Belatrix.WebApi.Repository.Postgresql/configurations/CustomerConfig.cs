@@ -1,9 +1,6 @@
 ﻿using Belatrix.WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Belatrix.WebApi.Repository.Postgresql.configurations
 {
@@ -41,6 +38,13 @@ namespace Belatrix.WebApi.Repository.Postgresql.configurations
 
             builder.HasIndex(p => new { p.LastName, p.FirstName })
                 .HasName("customer_name_idx");
+
+            builder.Metadata.FindNavigation(nameof(Customer.Order))
+                .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            builder.HasMany(x => x.Order).WithOne(c => c.Customer)
+                .HasForeignKey(b => b.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

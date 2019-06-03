@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Belatrix.WebApi.Models
 {
@@ -9,5 +10,10 @@ namespace Belatrix.WebApi.Models
         public string OrderNumber { get; set; }
         public int CustomerId { get; set; }
         public decimal? TotalAmount { get; set; }
+
+        public Customer Customer { get; set; }
+
+        public readonly List<OrderItem> _orderItem = new List<OrderItem>();
+        public IReadOnlyCollection<OrderItem> OrderItem => _orderItem;
     }
 }
