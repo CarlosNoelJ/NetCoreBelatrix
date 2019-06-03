@@ -1,30 +1,41 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Belatrix.WebApi.Repository.Postgresql
 {
-    public class Repository<T> : IRepository<T>
+    public class Repository<T> : IRepository<T> where T: class
     {
-        public Task<int> Create(T entity)
+        private readonly BelatrixDbContext _context;
+
+        public Repository(BelatrixDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task<bool> Delete(T entity)
+        public async Task<int> CreateAsync(T entity)
         {
-            throw new NotImplementedException();
+            await _context.AddAsync(entity);
+            return await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<T>> Read()
+        public async Task<bool> Delete(T entity)
         {
-            throw new NotImplementedException();
+             _context.Remove(entity);
+            return await _context.SaveChangesAsync() >0 ;
         }
 
-        public Task<bool> Update(T entity)
+        public async Task<IEnumerable<T>> Read()
         {
-            throw new NotImplementedException();
+            return await _context.Set<T>().ToListAsync();
+        }
+
+        public async Task<bool> Update(T entity)
+        {
+            _context.Update(entity);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }
