@@ -8,11 +8,13 @@ namespace Belatrix.WebApi.Repository.Postgresql.configurations
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {
-            builder.ToTable("order");
+            builder.ToTable("order")
+                .HasKey(c => c.Id)
+                .HasName("order_id_pkey"); ;
 
             builder.Property(p => p.Id)
                 .HasColumnName("id")
-                .UseNpgsqlSerialColumn();
+                .UseNpgsqlIdentityColumn();
 
             builder.Property(p => p.OrderDate)
                 .HasColumnName("order_date")

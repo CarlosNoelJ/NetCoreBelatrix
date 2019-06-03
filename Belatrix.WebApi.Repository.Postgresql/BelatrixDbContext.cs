@@ -1,9 +1,6 @@
 ﻿using Belatrix.WebApi.Models;
 using Belatrix.WebApi.Repository.Postgresql.configurations;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Belatrix.WebApi.Repository.Postgresql
 {
@@ -16,6 +13,10 @@ namespace Belatrix.WebApi.Repository.Postgresql
         }
 
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Order { get; set; }
+        public DbSet<OrderItem> OrderItem { get; set; }
+        public DbSet<Product> Product { get; set; }
+        public DbSet<Supplier> Supplier { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
