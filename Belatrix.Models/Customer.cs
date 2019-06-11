@@ -4,6 +4,11 @@ namespace Belatrix.WebApi.Models
 {
     public class Customer
     {
+        public Customer()
+        {
+            Order = new HashSet<Order>();
+        }
+
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -11,7 +16,6 @@ namespace Belatrix.WebApi.Models
         public string Country { get; set; }
         public string Phone { get; set; }
 
-        public readonly List<Order> _order = new List<Order>();
-        public IReadOnlyCollection<Order> Order => _order;
+        public ICollection<Order> Order { get; set; }
     }
 }

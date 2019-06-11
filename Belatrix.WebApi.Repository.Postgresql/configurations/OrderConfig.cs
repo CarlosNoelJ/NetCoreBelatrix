@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Belatrix.WebApi.Repository.Postgresql.configurations
+namespace Belatrix.WebApi.Repository.Postgresql.Configurations
 {
     internal class OrderConfig : IEntityTypeConfiguration<Order>
     {
@@ -12,35 +12,39 @@ namespace Belatrix.WebApi.Repository.Postgresql.configurations
                 .HasKey(c => c.Id)
                 .HasName("order_id_pkey"); ;
 
-            builder.Property(p => p.Id)
-                .HasColumnName("id")
-                .UseNpgsqlIdentityColumn();
+            builder.HasIndex(e => e.CustomerId)
+                .HasName("order_customer_id__idx");
 
-            builder.Property(p => p.OrderDate)
-                .HasColumnName("order_date")
+            builder.HasIndex(e => e.OrderDate)
+                .HasName("order_order_date__idx");
+
+            builder.Property(e => e.Id)
+                .HasColumnName("id")
+                .UseNpgsqlIdentityColumn()
                 .IsRequired();
 
-            builder.Property(p => p.OrderNumber)
+            builder.Property(e => e.CustomerId).HasColumnName("customer_id");
+
+            builder.Property(e => e.OrderDate)
+                .HasColumnName("order_date")
+                .HasColumnType("date");
+
+            builder.Property(e => e.OrderNumber)
                 .HasColumnName("order_number")
                 .HasMaxLength(10)
                 .IsRequired();
 
-            builder.Property(p => p.TotalAmount)
+            builder.Property(e => e.TotalAmount)
                 .HasColumnName("total_amount")
+                .HasColumnType("numeric(12,2)")
+                .HasDefaultValueSql("0")
                 .IsRequired();
 
-            builder.HasIndex(p => new { p.Id, p.OrderDate })
-                .HasName("order_orderDate_idx");
-
-            builder.HasIndex(p => new { p.Id, p.CustomerId})
-                .HasName("order_customerId_idx");
-
-            builder.Metadata.FindNavigation(nameof(Order.OrderItem))
-                .SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            builder.HasMany(x => x.OrderItem).WithOne(o => o.Order)
-                .HasForeignKey(c => c.OrderId)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(d => d.Customer)
+                .WithMany(p => p.Order)
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("order__reference_customer__idx");
         }
     }
 }

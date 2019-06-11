@@ -32,12 +32,12 @@ namespace Belatrix.WebApi.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     company_name = table.Column<string>(maxLength: 40, nullable: false),
-                    contac_name = table.Column<string>(maxLength: 50, nullable: false),
-                    contact_title = table.Column<string>(maxLength: 40, nullable: false),
-                    city = table.Column<string>(maxLength: 40, nullable: false),
-                    country = table.Column<string>(maxLength: 40, nullable: false),
-                    phone = table.Column<string>(maxLength: 30, nullable: false),
-                    fax = table.Column<string>(maxLength: 30, nullable: false)
+                    contact_name = table.Column<string>(maxLength: 50, nullable: true),
+                    contact_title = table.Column<string>(maxLength: 40, nullable: true),
+                    city = table.Column<string>(maxLength: 40, nullable: true),
+                    country = table.Column<string>(maxLength: 40, nullable: true),
+                    phone = table.Column<string>(maxLength: 30, nullable: true),
+                    fax = table.Column<string>(maxLength: 30, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -50,20 +50,20 @@ namespace Belatrix.WebApi.Migrations
                 {
                     id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    order_date = table.Column<DateTime>(nullable: false),
+                    order_date = table.Column<DateTime>(type: "date", nullable: false),
                     order_number = table.Column<string>(maxLength: 10, nullable: false),
-                    CustomerId = table.Column<int>(nullable: false),
-                    total_amount = table.Column<decimal>(nullable: false)
+                    customer_id = table.Column<int>(nullable: false),
+                    total_amount = table.Column<decimal>(type: "numeric(12,2)", nullable: false, defaultValueSql: "0")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("order_id_pkey", x => x.id);
                     table.ForeignKey(
-                        name: "FK_order_customer_CustomerId",
-                        column: x => x.CustomerId,
+                        name: "order__reference_customer__idx",
+                        column: x => x.customer_id,
                         principalTable: "customer",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,20 +73,20 @@ namespace Belatrix.WebApi.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     product_name = table.Column<string>(maxLength: 50, nullable: false),
-                    SupplierId = table.Column<int>(nullable: false),
-                    unit_price = table.Column<decimal>(nullable: false),
-                    product_package = table.Column<string>(maxLength: 30, nullable: false),
-                    product_discontinued = table.Column<bool>(nullable: false, defaultValue: false)
+                    supplier_id = table.Column<int>(nullable: false),
+                    unit_price = table.Column<decimal>(type: "numeric(12,2)", nullable: true, defaultValueSql: "0"),
+                    package = table.Column<string>(maxLength: 30, nullable: true),
+                    is_discontinued = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("product_id_pkey", x => x.id);
                     table.ForeignKey(
-                        name: "FK_product_supplier_SupplierId",
-                        column: x => x.SupplierId,
+                        name: "product__reference_supplier__fkey",
+                        column: x => x.supplier_id,
                         principalTable: "supplier",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,26 +95,26 @@ namespace Belatrix.WebApi.Migrations
                 {
                     id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OrderId = table.Column<int>(nullable: false),
-                    ProductId = table.Column<int>(nullable: false),
-                    unit_price = table.Column<decimal>(nullable: false),
-                    quantity = table.Column<int>(nullable: false)
+                    order_id = table.Column<int>(nullable: false),
+                    product_id = table.Column<int>(nullable: false),
+                    unit_price = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
+                    quantity = table.Column<int>(nullable: false, defaultValueSql: "1")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("orderitem_id_pkey", x => x.id);
+                    table.PrimaryKey("order_item__id__pkey", x => x.id);
                     table.ForeignKey(
-                        name: "FK_order_item_order_OrderId",
-                        column: x => x.OrderId,
+                        name: "order_item__reference_order__fkey",
+                        column: x => x.order_id,
                         principalTable: "order",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_order_item_product_ProductId",
-                        column: x => x.ProductId,
+                        name: "order_item__reference_product__fkey",
+                        column: x => x.product_id,
                         principalTable: "product",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -123,39 +123,24 @@ namespace Belatrix.WebApi.Migrations
                 columns: new[] { "last_name", "first_name" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_CustomerId",
+                name: "order_customer_id__idx",
                 table: "order",
-                column: "CustomerId");
+                column: "customer_id");
 
             migrationBuilder.CreateIndex(
-                name: "order_customerId_idx",
+                name: "order_order_date__idx",
                 table: "order",
-                columns: new[] { "id", "CustomerId" });
+                column: "order_date");
 
             migrationBuilder.CreateIndex(
-                name: "order_orderDate_idx",
-                table: "order",
-                columns: new[] { "id", "order_date" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_order_item_OrderId",
+                name: "order_item__order_id__idx",
                 table: "order_item",
-                column: "OrderId");
+                column: "order_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_item_ProductId",
+                name: "order_item__produc_tid__idx",
                 table: "order_item",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "orderItem_order_idx",
-                table: "order_item",
-                columns: new[] { "id", "OrderId" });
-
-            migrationBuilder.CreateIndex(
-                name: "orderItem_product_idx",
-                table: "order_item",
-                columns: new[] { "id", "ProductId" });
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "product_name_idx",
@@ -163,22 +148,17 @@ namespace Belatrix.WebApi.Migrations
                 column: "product_name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_product_SupplierId",
+                name: "product__supplier_id__idx",
                 table: "product",
-                column: "SupplierId");
+                column: "supplier_id");
 
             migrationBuilder.CreateIndex(
-                name: "product_supplier_idx",
-                table: "product",
-                columns: new[] { "id", "SupplierId" });
-
-            migrationBuilder.CreateIndex(
-                name: "contact_name_idx",
+                name: "supplier_name_idx",
                 table: "supplier",
-                column: "contac_name");
+                column: "company_name");
 
             migrationBuilder.CreateIndex(
-                name: "country",
+                name: "supplier_country_idx",
                 table: "supplier",
                 column: "country");
         }
