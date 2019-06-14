@@ -54,5 +54,32 @@ namespace Belatrix.WebApi.Tests
             values.Should().Be(newCustomer.Id);
 
         }
+
+        [Fact]
+        public async Task CustomerController_UpdateCustomer_OK()
+        {
+            var db = _builder
+                    .ConfigureInMemory()
+                    .Build();
+
+            var repository = new Repository<Models.Customer>(db);
+            var controller = new CustomerController(repository);
+
+            var newName = "Test";
+
+            var newCustomer = A.New<Models.Customer>();
+
+            var updateCustomer = A.Configure<Models.Customer>()
+                                    .Fill(c => c.FirstName, () => { return newName; });
+
+            //var customerUpdated = newCustomer.FirstName.
+
+            var response = (await controller.PutCustomer(newCustomer)).Result as OkObjectResult;
+
+            var values = Convert.ToInt32(response.Value);
+
+            values.Should().Be(newCustomer.Id);
+
+        }
     }
 }
