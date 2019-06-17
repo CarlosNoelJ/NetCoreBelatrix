@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Belatrix.WebApi;
 using Belatrix.WebApi.Models;
+using Belatrix.WebApi.Profiles;
 using Belatrix.WebApi.Repository;
 using Belatrix.WebApi.Repository.Postgresql;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +34,13 @@ namespace Belatrix.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AddProfile<CustomerProfile>();
+            });
+
+            services.AddAutoMapper(typeof(Startup).Assembly);
+
             services.AddControllers()
                 .AddNewtonsoftJson();
 
