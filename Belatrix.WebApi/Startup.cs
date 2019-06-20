@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Belatrix.WebApi;
+using Belatrix.WebApi.identity.Data;
 using Belatrix.WebApi.Models;
 using Belatrix.WebApi.Profiles;
 using Belatrix.WebApi.Repository;
@@ -11,6 +12,7 @@ using Belatrix.WebApi.Repository.Postgresql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -50,6 +52,17 @@ namespace Belatrix.WebApi
                 b => b.MigrationsAssembly("Belatrix.WebApi")))
                .BuildServiceProvider();
 
+            services.AddEntityFrameworkNpgsql()
+               .AddDbContext<ApplicationDbcontext>(
+                opt => opt.UseNpgsql(Configuration.GetConnectionString("postgresql")))
+               .BuildServiceProvider();
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbcontext>()
+                .AddDefaultTokenProviders();
+
+
+
             // all in services is the register of the container netCore
             services.AddTransient<IRepository<Customer>, Repository<Customer>>();
             services.AddSwaggerGen(c =>{
@@ -73,6 +86,8 @@ namespace Belatrix.WebApi
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            SeadData.Initialize(app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider);
 
             app.UseHttpsRedirection();
 
