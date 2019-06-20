@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Belatrix.WebApi.Repository"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Belatrix.WebApi.Repository.Postgresql", "Belatrix.WebApi.Repository.Postgresql\Belatrix.WebApi.Repository.Postgresql.csproj", "{6490CBF7-7FE5-4F00-938D-E649A8DBE88F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Belatrix.WebApi.Tests", "Belatrix.WebApi.Tests\Belatrix.WebApi.Tests.csproj", "{6BDDB352-1FE6-428B-B961-F59BDAA5D8D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Belatrix.WebApi.Tests", "Belatrix.WebApi.Tests\Belatrix.WebApi.Tests.csproj", "{6BDDB352-1FE6-428B-B961-F59BDAA5D8D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
